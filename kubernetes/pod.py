@@ -42,7 +42,7 @@ class RestartPolicyAlways(object):
 
     def AsJsonString(self):
         '''A JSON string representation of this kubernetes.RestartPolicyAlways instance.
-    
+
         Returns:
           A JSON string representation of this kubernetes.RestartPolicyAlways instance.
         '''
@@ -97,7 +97,7 @@ class RestartPolicyOnFailure(object):
 
     def AsJsonString(self):
         '''A JSON string representation of this kubernetes.RestartPolicyOnFailure instance.
-    
+
         Returns:
           A JSON string representation of this kubernetes.RestartPolicyOnFailure instance.
         '''
@@ -151,7 +151,7 @@ class RestartPolicyNever(object):
 
     def AsJsonString(self):
         '''A JSON string representation of this kubernetes.RestartPolicyNever instance.
-    
+
         Returns:
           A JSON string representation of this kubernetes.RestartPolicyNever instance.
         '''
@@ -191,18 +191,18 @@ class RestartPolicy(object):
     """
     def __init__(self, **kwargs):
         '''An object to hold a Kubernete RestartPolicy.
-        
+
         Arg:
-         
+
          Always:
          OnFailure:
          Never:
              Only one of the following restart policies may be specified.
             If none of the following policies is specified, the default one
             is RestartPolicyAlways.
-         
+
         '''
-        
+
         param_defaults = {
             'Always':                         None,
             'OnFailure':                     None,
@@ -235,7 +235,7 @@ class RestartPolicy(object):
 
     def AsJsonString(self):
         '''A JSON string representation of this kubernetes.RestartPolicy instance.
-    
+
         Returns:
           A JSON string representation of this kubernetes.RestartPolicy instance.
         '''
@@ -290,7 +290,7 @@ class RestartPolicy(object):
 
 class PodState(object):
     """A Class representing the PodState structure used by the kubernetes API
-    
+
     PodState is the state of a pod, used as either input (desired state) or output (current state).
 
     The PodState structure exposes the following properties:
@@ -305,9 +305,9 @@ class PodState(object):
     """
     def __init__(self, **kwargs):
         '''An object to hold a Kubernete PodState.
-        
+
         Arg:
-         
+
          Manifest:
          Status:
          Host:
@@ -320,9 +320,9 @@ class PodState(object):
             upon.
             TODO: Make real decisions about what our info should look like. Re-enable fuzz test
             when we have done this.
-         
+
         '''
-        
+
         param_defaults = {
             'Manifest':                     None,
             'Status':                         None,
@@ -361,7 +361,7 @@ class PodState(object):
 
     def AsJsonString(self):
         '''A JSON string representation of this kubernetes.PodState instance.
-    
+
         Returns:
           A JSON string representation of this kubernetes.PodState instance.
         '''
@@ -424,7 +424,7 @@ class PodState(object):
 from kubernetes import TypeMeta
 class PodList(TypeMeta):
     """A Class representing the PodList structure used by the kubernetes API
-    
+
     PodList is a list of Pods.
 
     The PodList structure exposes the following properties:
@@ -434,13 +434,13 @@ class PodList(TypeMeta):
     """
     def __init__(self, **kwargs):
         '''An object to hold a Kubernete PodList.
-        
+
         Arg:
-         
+
          Items:
-         
+
         '''
-        
+
         param_defaults = {
             'Items':                     None}
 
@@ -472,7 +472,7 @@ class PodList(TypeMeta):
 
     def AsJsonString(self):
         '''A JSON string representation of this kubernetes.PodList instance.
-    
+
         Returns:
           A JSON string representation of this kubernetes.PodList instance.
         '''
@@ -521,7 +521,7 @@ class PodList(TypeMeta):
 
 class Pod(TypeMeta):
     """A Class representing the Pod structure used by the kubernetes API
-    
+
     Pod is a collection of containers, used as either input (create, update) or as output (list, get).
 
     The Pod structure exposes the following properties:
@@ -533,15 +533,15 @@ class Pod(TypeMeta):
     """
     def __init__(self, **kwargs):
         '''An object to hold a Kubernete Pod.
-        
+
         Arg:
-         
+
          Labels:
          DesiredState:
          CurrentState:
-         
+
         '''
-        
+
         param_defaults = {
             'Labels':                             None,
             'DesiredState':                     None,
@@ -577,7 +577,7 @@ class Pod(TypeMeta):
 
     def AsJsonString(self):
         '''A JSON string representation of this kubernetes.Pod instance.
-    
+
         Returns:
           A JSON string representation of this kubernetes.Pod instance.
         '''
@@ -612,6 +612,9 @@ class Pod(TypeMeta):
         desiredState = None
         currentState = None
 
+        metadata = data.get('metadata', None)
+        status = data.get('status', None)
+
         if 'desiredState' in data:
             from kubernetes import PodState
             desiredState = PodState.NewFromJsonDict(data['desiredState'])
@@ -622,14 +625,14 @@ class Pod(TypeMeta):
 
         return Pod(
                     Kind=data.get('kind', None),
-                    ID=data.get('id', None),
-                    UID=data.get('uid', None),
-                    CreationTimestamp=data.get('creationTimestamp', None),
-                    SelfLink=data.get('selfLink', None),
-                    ResourceVersion=data.get('resourceVersion', None),
                     APIVersion=data.get('apiVersion', None),
-                    Namespace=data.get('namespace', None),
-                    Annotations=data.get('annotations', None),
+                    Name=metadata.get('name', None),
+                    UID=metadata.get('uid', None),
+                    CreationTimestamp=metadata.get('creationTimestamp', None),
+                    SelfLink=metadata.get('selfLink', None),
+                    ResourceVersion=metadata.get('resourceVersion', None),
+                    Namespace=metadata.get('namespace', None),
+                    #Annotations=data.get('annotations', None),
 
                     Labels=data.get('labels', None),
                     DesiredState=desiredState,
@@ -638,7 +641,7 @@ class Pod(TypeMeta):
 
 class ReplicationControllerState(object):
     """A Class representing the ReplicationControllerState structure used by the kubernetes API
-    
+
     ReplicationControllerState is the state of a pod, used as either input (desired state) or output (current state).
 
     The ReplicationControllerState structure exposes the following properties:
@@ -650,15 +653,15 @@ class ReplicationControllerState(object):
     """
     def __init__(self, **kwargs):
         '''An object to hold a Kubernete ReplicationControllerState.
-        
+
         Arg:
          Replicas:
          ReplicaSelector
          PodTemplate:
-             
-         
+
+
         '''
-        
+
         param_defaults = {
             'Replicas':                         None,
             'ReplicaSelector':                     None,
@@ -691,7 +694,7 @@ class ReplicationControllerState(object):
 
     def AsJsonString(self):
         '''A JSON string representation of this kubernetes.ReplicationControllerState instance.
-    
+
         Returns:
           A JSON string representation of this kubernetes.ReplicationControllerState instance.
         '''
@@ -736,7 +739,7 @@ class ReplicationControllerState(object):
 
 class ReplicationControllerList(TypeMeta):
     """A Class representing the ReplicationControllerList structure used by the kubernetes API
-    
+
     ReplicationControllerList is a collection of replication controllers.
 
     The ReplicationControllerList structure exposes the following properties:
@@ -746,13 +749,13 @@ class ReplicationControllerList(TypeMeta):
     """
     def __init__(self, **kwargs):
         '''An object to hold a Kubernete ReplicationControllerList.
-        
+
         Arg:
-         
+
          Items:
-         
+
         '''
-        
+
         param_defaults = {
             'Items':                             None}
 
@@ -784,7 +787,7 @@ class ReplicationControllerList(TypeMeta):
 
     def AsJsonString(self):
         '''A JSON string representation of this kubernetes.ReplicationControllerList instance.
-    
+
         Returns:
           A JSON string representation of this kubernetes.ReplicationControllerList instance.
         '''
@@ -834,7 +837,7 @@ class ReplicationControllerList(TypeMeta):
 
 class ReplicationController(TypeMeta):
     """A Class representing the ReplicationController structure used by the kubernetes API
-    
+
     ReplicationController represents the configuration of a replication controller.
 
     The ReplicationController structure exposes the following properties:
@@ -846,15 +849,15 @@ class ReplicationController(TypeMeta):
     """
     def __init__(self, **kwargs):
         '''An object to hold a Kubernete ReplicationController.
-        
+
         Arg:
-         
+
          DesiredState:
          CurrentState:
          Labels:
-         
+
         '''
-        
+
         param_defaults = {
             'DesiredState':                             None,
             'CurrentState':                             None,
@@ -890,7 +893,7 @@ class ReplicationController(TypeMeta):
 
     def AsJsonString(self):
         '''A JSON string representation of this kubernetes.ReplicationController instance.
-    
+
         Returns:
           A JSON string representation of this kubernetes.ReplicationController instance.
         '''
@@ -941,7 +944,7 @@ class ReplicationController(TypeMeta):
 
 class PodTemplate(object):
     """A Class representing the PodTemplate structure used by the kubernetes API
-    
+
     PodTemplate holds the information used for creating pods.
 
     The PodTemplate structure exposes the following properties:
@@ -952,14 +955,14 @@ class PodTemplate(object):
     """
     def __init__(self, **kwargs):
         '''An object to hold a Kubernete PodTemplate.
-        
+
         Arg:
          DesiredState:
          Labels
-             
-         
+
+
         '''
-        
+
         param_defaults = {
             'DesiredState':                         None,
             'Labels':                                 None}
@@ -990,7 +993,7 @@ class PodTemplate(object):
 
     def AsJsonString(self):
         '''A JSON string representation of this kubernetes.PodTemplate instance.
-    
+
         Returns:
           A JSON string representation of this kubernetes.PodTemplate instance.
         '''

@@ -123,11 +123,20 @@ class Api(object):
         self._user_id = None
         self._user_password = None
 
-    def GetPods(self):
+    def CreatePod(self, data, namespace='default'):
+        '''Create a new Pod'''
+
+        url = '%s/'
+
+    def GetPods(self, namespace=None):
         '''List all pods on this cluster'''
 
         # Make and send requests
-        url = '%s/pods' % self.base_url
+        if namespace:
+            url = ('%(base_url)s/namespaces/%(ns)s/pods' %
+                {"base_url":self.base_url, "ns":namespace})
+        else:
+            url = '%s/pods' % self.base_url
         json = self._RequestUrl(url, 'GET')
         data = self._ParseAndCheckKubernetes(json.content)
         return PodList.NewFromJsonDict(data)
