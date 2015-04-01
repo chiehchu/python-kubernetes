@@ -326,6 +326,7 @@ class PodState(object):
         param_defaults = {
             'Manifest':                     None,
             'Status':                         None,
+            'Phase':                         None,
             'Host':                         None,
             'HostIP':                         None,
             'PodIP':                         None,
@@ -342,6 +343,7 @@ class PodState(object):
             return other and \
             self.Manifest == other.Manifest and \
             self.Status == other.Status and \
+            self.Phase == other.Phase and \
             self.Host == other.Host and \
             self.HostIP == other.HostIP and \
             self.PodIP == other.PodIP and \
@@ -379,6 +381,8 @@ class PodState(object):
         data = {}
         if self.Manifest:
             data['manifest'] = self.Manifest.AsDict()
+        if self.Phase:
+            data['phase'] = self.Phase
         if self.Status:
             data['status'] = self.Status
         if self.Host:
@@ -415,6 +419,7 @@ class PodState(object):
         return PodState(
                     Manifest=manifest,
                     Status=data.get('status', None),
+                    Phase=data.get('phase', None),
                     Host=data.get('host', None),
                     HostIP=data.get('hostIP', None),
                     PodIP=data.get('podIP', None),
@@ -501,6 +506,7 @@ class PodList(TypeMeta):
         '''
 
         items = None
+        metadata = data.get('metadata', None)
 
         if 'items' in data and data['items']:
             from kubernetes import Pod
@@ -508,14 +514,14 @@ class PodList(TypeMeta):
 
         return PodList(
                     Kind=data.get('kind', None),
-                    ID=data.get('id', None),
-                    UID=data.get('uid', None),
-                    CreationTimestamp=data.get('creationTimestamp', None),
-                    SelfLink=data.get('selfLink', None),
-                    ResourceVersion=data.get('resourceVersion', None),
                     APIVersion=data.get('apiVersion', None),
-                    Namespace=data.get('namespace', None),
-                    Annotations=data.get('annotations', None),
+                    CreationTimestamp=metadata.get('creationTimestamp', None),
+                    SelfLink=metadata.get('selfLink', None),
+                    ResourceVersion=metadata.get('resourceVersion', None),
+                    Name=metadata.get('name', None),
+                    UID=metadata.get('uid', None),
+                    Namespace=metadata.get('namespace', None),
+                    Annotations=metadata.get('annotations', None),
 
                     Items=items)
 
@@ -545,7 +551,9 @@ class Pod(TypeMeta):
         param_defaults = {
             'Labels':                             None,
             'DesiredState':                     None,
-            'CurrentState':                     None}
+            'CurrentState':                     None,
+            'Status':                     None,
+            '': None,}
 
         for (param, default) in param_defaults.iteritems():
             setattr(self, param, kwargs.get(param, default))
@@ -561,6 +569,7 @@ class Pod(TypeMeta):
             self.Labels == other.Labels and \
             self.DesiredState == other.DesiredState and \
             self.CurrentState == other.CurrentState and \
+            self.Status == other.Status and \
             super(Pod, self).__eq__(other)
         except AttributeError:
             return False
@@ -581,7 +590,7 @@ class Pod(TypeMeta):
         Returns:
           A JSON string representation of this kubernetes.Pod instance.
         '''
-        return simplejson.dumps(dict(self.AsDict().items()+super(PodList, self).AsDict().items()), sort_keys=True)
+        return simplejson.dumps(dict(self.AsDict().items()+super(Pod, self).AsDict().items()), sort_keys=True)
 
     def AsDict(self):
         ''' A dic representation of this kubernetes.Pod instance.
@@ -591,13 +600,15 @@ class Pod(TypeMeta):
         Returns:
           A dict representing this kubernetes.Pod instance
         '''
-        data = {}
+        data = super(Pod, self).AsDict()
         if self.Labels:
             data['labels'] = self.Labels
         if self.DesiredState:
             data['desiredState'] = self.DesiredState.AsDict()
         if self.CurrentState:
             data['currentState'] = self.CurrentState.AsDict()
+        if self.Status:
+            data['status'] = self.Status.AsDict()
         return data
 
     @staticmethod
@@ -611,6 +622,7 @@ class Pod(TypeMeta):
 
         desiredState = None
         currentState = None
+        state = None
 
         metadata = data.get('metadata', None)
         status = data.get('status', None)
@@ -623,6 +635,10 @@ class Pod(TypeMeta):
             from kubernetes import PodState
             currentState = PodState.NewFromJsonDict(data['currentState'])
 
+        if 'status' in data:
+            from kubernetes import PodState
+            state = PodState.NewFromJsonDict(data['status'])
+
         return Pod(
                     Kind=data.get('kind', None),
                     APIVersion=data.get('apiVersion', None),
@@ -632,9 +648,9 @@ class Pod(TypeMeta):
                     SelfLink=metadata.get('selfLink', None),
                     ResourceVersion=metadata.get('resourceVersion', None),
                     Namespace=metadata.get('namespace', None),
-                    #Annotations=data.get('annotations', None),
-
-                    Labels=data.get('labels', None),
+                    Annotations=metadata.get('annotations', None),
+                    Labels=metadata.get('labels', None),
+                    Status=state,
                     DesiredState=desiredState,
                     CurrentState=currentState)
 

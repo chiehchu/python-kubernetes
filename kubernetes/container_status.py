@@ -18,13 +18,13 @@ from kubernetes import simplejson
 
 class TypeMeta(object):
     '''A Class representing the TypeMeta structure used by the kubernetes API
-    
+
     TypeMeta is shared by all objects sent to, or returned from the client.
 
     The TypeMeta structure exposes the following properties:
 
     TypeMeta.Kind
-    TypeMeta.ID
+    TypeMeta.Name
     TypeMeta.UID
     TypeMeta.CreationTimestamp
     TypeMeta.SelfLink
@@ -39,7 +39,7 @@ class TypeMeta(object):
 
         Args:
           Kind:
-          ID:
+          Name:
           UID:
           CreationTimestamp:
           SelfLink:
@@ -54,7 +54,7 @@ class TypeMeta(object):
 
         param_defaults = {
             'Kind':                         None,
-            'ID':                            None,
+            'Name':                            None,
             'UID':                            None,
             'CreationTimestamp':            None,
             'SelfLink':                        None,
@@ -62,7 +62,7 @@ class TypeMeta(object):
             'APIVersion':                    None,
             'Namespace':                    None,
             'Annotations':                    None}
-        
+
         for (param, default) in param_defaults.iteritems():
             setattr(self, param, kwargs.get(param, default))
 
@@ -73,7 +73,7 @@ class TypeMeta(object):
         try:
             return other and \
                     self.Kind == other.Kind and \
-                    self.ID == other.ID and \
+                    self.Name == other.Name and \
                     self.UID == other.UID and \
                     self.CreationTimestamp == other.CreationTimestamp and \
                     self.SelfLink == other.SelfLink and \
@@ -86,7 +86,7 @@ class TypeMeta(object):
 
     def __str__(self):
         '''A string representation of this kubernetes.TypeMeta instance.
-    
+
         The return value is the same as the JSON string representation.
 
         Returns:
@@ -96,7 +96,7 @@ class TypeMeta(object):
 
     def AsJsonString(self):
         '''A JSON string representation of this kubernetes.TypeMeta instance.
-    
+
         Returns:
           A JSON string representation of this kubernetes.TypeMeta instance.
         '''
@@ -113,8 +113,8 @@ class TypeMeta(object):
         data = {}
         if self.Kind:
             data['kind'] = self.Kind
-        if self.ID:
-            data['id'] = self.ID
+        if self.Name:
+            data['name'] = self.Name
         if self.UID:
             data['uid'] = self.UID
         if self.CreationTimestamp:
@@ -141,21 +141,22 @@ class TypeMeta(object):
         Returns:
           A kubernetes.TypeMeta instance
         '''
+        metadata = data.get('metadata', None)
         return TypeMeta(kind=data.get('kind', None),
-            id=data.get('id', None),
-            uid=data.get('uid', None),
-            creationTimestamp=data.get('creationTimestamp', None),
-            selfLink=data.get('selfLink', None),
-            resourceVersion=data.get('resourceVersion', None),
             apiVersion=data.get('apiVersion', None),
-            namespace=data.get('namespace', None),
-            annotations=data.get('annotations', None))
+            name=metadata.get('name', None),
+            uid=metadata.get('uid', None),
+            creationTimestamp=metadata.get('creationTimestamp', None),
+            selfLink=metadata.get('selfLink', None),
+            resourceVersion=metadata.get('resourceVersion', None),
+            namespace=metadata.get('namespace', None),
+            annotations=metadata.get('annotations', None))
 
 
 class PodStatus(object):
     """PodStatus represents a status of a pod.
     """
-    
+
     '''PodWaiting means that we're waiting for the pod to begin running.
     '''
     PodWaiting = "Waiting"
@@ -167,7 +168,7 @@ class PodStatus(object):
     '''PodTerminated means that the pod has stopped.
     '''
     PodTerminated = "Terminated"
-        
+
 
 class ContainerStateWaiting(object):
     '''A Class representing the ContainerStateWaiting structure used by the kubernetes API
@@ -187,7 +188,7 @@ class ContainerStateWaiting(object):
 
         param_defaults = {
             'Reason':                         None}
-        
+
         for (param, default) in param_defaults.iteritems():
             setattr(self, param, kwargs.get(param, default))
 
@@ -203,7 +204,7 @@ class ContainerStateWaiting(object):
 
     def __str__(self):
         '''A string representation of this kubernetes.ContainerStateWaiting instance.
-    
+
         The return value is the same as the JSON string representation.
 
         Returns:
@@ -213,7 +214,7 @@ class ContainerStateWaiting(object):
 
     def AsJsonString(self):
         '''A JSON string representation of this kubernetes.ContainerStateWaiting instance.
-    
+
         Returns:
           A JSON string representation of this kubernetes.ContainerStateWaiting instance.
         '''
@@ -262,7 +263,7 @@ class ContainerStateRunning(object):
 
         param_defaults = {
             'StartedAt':                         None}
-        
+
         for (param, default) in param_defaults.iteritems():
             setattr(self, param, kwargs.get(param, default))
 
@@ -278,7 +279,7 @@ class ContainerStateRunning(object):
 
     def __str__(self):
         '''A string representation of this kubernetes.ContainerStateRunning instance.
-    
+
         The return value is the same as the JSON string representation.
 
         Returns:
@@ -288,7 +289,7 @@ class ContainerStateRunning(object):
 
     def AsJsonString(self):
         '''A JSON string representation of this kubernetes.ContainerStateRunning instance.
-    
+
         Returns:
           A JSON string representation of this kubernetes.ContainerStateRunning instance.
         '''
@@ -322,7 +323,7 @@ class ContainerStateRunning(object):
 
 class ContainerStateTerminated(object):
     '''A Class representing the ContainerStateTerminated structure used by the kubernetes API
-    
+
     ContainerStateTerminated is shared by all objects sent to, or returned from the client.
 
     The ContainerStateTerminated structure exposes the following properties:
@@ -351,7 +352,7 @@ class ContainerStateTerminated(object):
             'Reason':                            None,
             'StartedAt':                        None,
             'FinishedAt':                        None}
-        
+
         for (param, default) in param_defaults.iteritems():
             setattr(self, param, kwargs.get(param, default))
 
@@ -371,7 +372,7 @@ class ContainerStateTerminated(object):
 
     def __str__(self):
         '''A string representation of this kubernetes.ContainerStateTerminated instance.
-    
+
         The return value is the same as the JSON string representation.
 
         Returns:
@@ -381,7 +382,7 @@ class ContainerStateTerminated(object):
 
     def AsJsonString(self):
         '''A JSON string representation of this kubernetes.ContainerStateTerminated instance.
-    
+
         Returns:
           A JSON string representation of this kubernetes.ContainerStateTerminated instance.
         '''
@@ -437,14 +438,14 @@ class ContainerState(object):
     """
     def __init__(self, **kwargs):
         '''An object to hold a Kubernete ContainerState.
-        
+
         Arg:
              Only one of the following ContainerState may be specified.
             If none of them is specified, the default one is ContainerStateWaiting.
          Waiting:
          Running:
          Termination:
-         
+
         '''
 
         param_defaults = {
@@ -479,7 +480,7 @@ class ContainerState(object):
 
     def AsJsonString(self):
         '''A JSON string representation of this kubernetes.ContainerState instance.
-    
+
         Returns:
           A JSON string representation of this kubernetes.ContainerState instance.
         '''
@@ -546,9 +547,9 @@ class ContainerStatus(object):
     """
     def __init__(self, **kwargs):
         '''An object to hold a Kubernete ContainerStatus.
-        
+
         Arg:
-         
+
          State:
              TODO(dchen1107): Should we rename PodStatus to a more generic name or have a separate states
             defined for container?
@@ -595,7 +596,7 @@ class ContainerStatus(object):
 
     def AsJsonString(self):
         '''A JSON string representation of this kubernetes.ContainerStatus instance.
-    
+
         Returns:
           A JSON string representation of this kubernetes.ContainerStatus instance.
         '''

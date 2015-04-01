@@ -117,7 +117,7 @@ def main():
 
   api = kubernetes.Api(user_id=None, user_password=None,
                     input_encoding=encoding,
-                    base_url='http://172.30.10.185:8080/api/v1beta2',
+                    base_url='http://172.30.10.185:8080/api/v1beta3',
                     debugHTTP=True)
   try:
     pod_list = api.GetPods()
@@ -126,19 +126,19 @@ def main():
     sys.exit(2)
   print "GetPods: %s" % (pod_list.AsJsonString())
 
-  try:
-    pod_list = api.GetReplicationControllers()
-  except UnicodeDecodeError:
-    print "Error!! "
-    sys.exit(2)
-  print "GetReplicationControllers: %s" % (pod_list.AsJsonString())
+  #try:
+    #pod_list = api.GetReplicationControllers()
+  #except UnicodeDecodeError:
+    #print "Error!! "
+    #sys.exit(2)
+  #print "GetReplicationControllers: %s" % (pod_list.AsJsonString())
 
-  try:
-    pod_list = api.GetServices()
-  except UnicodeDecodeError:
-    print "Error!! "
-    sys.exit(2)
-  print "GetServices: %s" % (pod_list.AsJsonString())
+  #try:
+    #pod_list = api.GetServices()
+  #except UnicodeDecodeError:
+    #print "Error!! "
+    #sys.exit(2)
+  #print "GetServices: %s" % (pod_list.AsJsonString())
 
 if __name__ == "__main__":
   main()
