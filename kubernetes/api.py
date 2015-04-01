@@ -6,7 +6,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#	 http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,9 +45,9 @@ class Api(object):
 
 		Args:
 		  user_id:
-		    Your agent user id
+			Your agent user id
 		  user_password
-		    Your agent user password
+			Your agent user password
 		  input_encoding:
 		  	The encoding used to encode input strings. [Optional]
 		  request_headers
@@ -56,8 +56,8 @@ class Api(object):
 		  	The cache instance to use. Defaults to DEFAULT_CACHE.
 		  	Use None to disable caching. [Optional]
 		  base_url:
-		    The base URL to use to contact the kubernetes API.
-		    Defaults to https://10.245.1.2/api/v1beta2
+			The base URL to use to contact the kubernetes API.
+			Defaults to https://10.245.1.2/api/v1beta2
 		  debugHTTP:
 		  	Set to True to enable debug output from urllib2 when performing
 			any HTTP requests.  Defaults to False. [Optional]
@@ -136,7 +136,7 @@ class Api(object):
 		'''List all replicationControllers on this cluster'''
 
 		# Make and send requests
-		url = '%s/replicationcontrollers' % self.base_url
+		url = '%s/replicationControllers' % self.base_url
 		json = self._RequestUrl(url, 'GET')
 		data = self._ParseAndCheckKubernetes(json.content)
 		return PodList.NewFromJsonDict(data)

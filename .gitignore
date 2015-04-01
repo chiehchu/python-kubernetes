@@ -11,5 +11,7 @@ build
 #Ctags
 .tags
 .tags_sorted_by_file
-
+tags
+cscope*
+mktags*
 .DS_Store

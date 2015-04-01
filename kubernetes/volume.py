@@ -6,7 +6,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#	 http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,7 @@ from kubernetes import simplejson
 
 class Volume(object):
 	'''A Class representing the Volume structure used by the kubernetes API
-	
+
 	Volume represents a named volume in a pod that may be accessed by any containers in the pod.
 
 	The Volume structure exposes the following properties:
@@ -46,7 +46,7 @@ class Volume(object):
 		param_defaults = {
 			'Name': 				None,
 			'Source':				None}
-		
+
 		for (param, default) in param_defaults.iteritems():
 			setattr(self, param, kwargs.get(param, default))
 
@@ -63,7 +63,7 @@ class Volume(object):
 
 	def __str__(self):
 		'''A string representation of this kubernetes.Volume instance.
-	
+
 		The return value is the same as the JSON string representation.
 
 		Returns:
@@ -73,7 +73,7 @@ class Volume(object):
 
 	def AsJsonString(self):
 		'''A JSON string representation of this kubernetes.Volume instance.
-	
+
 		Returns:
 		  A JSON string representation of this kubernetes.Volume instance.
 		'''
@@ -90,7 +90,7 @@ class Volume(object):
 		data = {}
 		if self.Name:
 			data['name'] = self.Name
-		if self.source:
+		if self.Source:
 			data['source'] = self.Source.AsDict()
 		return data
 
@@ -106,7 +106,7 @@ class Volume(object):
 		'''
 
 		if 'source' in data:
-			from kubernetes import VolumeSource
+			from kubernetes.volume import VolumeSource
 			source = VolumeSource.NewFromJsonDict(data['source'])
 		else:
 			source = None
@@ -116,7 +116,7 @@ class Volume(object):
 
 class VolumeSource(object):
 	'''A Class representing the VolumeSource structure used by the kubernetes API
-	
+
 	VolumeSource represents a named volumeSource in a pod that may be accessed by any containers in the pod.
 
 	The VolumeSource structure exposes the following properties:
@@ -151,7 +151,7 @@ class VolumeSource(object):
 			'HostDir': 						None,
 			'EmptyDir':						None,
 			'PersistentDisk':				None}
-		
+
 		for (param, default) in param_defaults.iteritems():
 			setattr(self, param, kwargs.get(param, default))
 
@@ -164,12 +164,12 @@ class VolumeSource(object):
 					self.HostDir == other.HostDir and \
 					self.EmptyDir == other.EmptyDir and \
 					self.PersistentDisk == other.PersistentDisk
-		except AttributeError: 
+		except AttributeError:
 			return False
 
 	def __str__(self):
 		'''A string representation of this kubernetes.VolumeSource instance.
-	
+
 		The return value is the same as the JSON string representation.
 
 		Returns:
@@ -179,7 +179,7 @@ class VolumeSource(object):
 
 	def AsJsonString(self):
 		'''A JSON string representation of this kubernetes.VolumeSource instance.
-	
+
 		Returns:
 		  A JSON string representation of this kubernetes.VolumeSource instance.
 		'''
@@ -213,21 +213,21 @@ class VolumeSource(object):
 		  A kubernetes.VolumeSource instance
 		'''
 
-		if 'hostDir' in data:
-			from kubernetes import HostDir
+		if data.get('hostDir', None):
+			from kubernetes.volume import HostDir
 			hostDir = HostDir.NewFromJsonDict(data['hostDir'])
 		else:
 			hostDir = None
 
-		if 'emptyDir' in data:
-			from kubernetes import EmptyDir
+		if data.get('emptyDir', None):
+			from kubernetes.volume import EmptyDir
 			emptyDir = EmptyDir.NewFromJsonDict(data['emptyDir'])
 		else:
 			emptyDir = None
 
-		if 'persistentDisk' in data:
-			from kubernetes import PersistentDisk
-			persistentDisk = PersistentDisk.NewFromJsonDict(data['persistentDisk'])
+		if  data.get('persistentDisk', None):
+			from kubernetes.volume import GCEPersistentDisk
+			persistentDisk = GCEPersistentDisk.NewFromJsonDict(data['persistentDisk'])
 		else:
 			persistentDisk = None
 
@@ -239,7 +239,7 @@ class VolumeSource(object):
 
 class HostDir(object):
 	"""A Class representing the HostDir structure used by the kubernetes API
-	
+
 	HostDir represents bare host directory volume.
 
 	The HostDir structure exposes the following properties:
@@ -249,12 +249,12 @@ class HostDir(object):
 	"""
 	def __init__(self, **kwargs):
 		'''An object to hold a Kubernete HostDir.
-		
+
 		Arg:
 		 Path:
 		 	The path of this HostDir
 		'''
-		
+
 		param_defaults = {
 			'Path': 					None}
 
@@ -283,7 +283,7 @@ class HostDir(object):
 
 	def AsJsonString(self):
 		'''A JSON string representation of this kubernetes.HostDir instance.
-	
+
 		Returns:
 		  A JSON string representation of this kubernetes.HostDir instance.
 		'''
@@ -310,6 +310,7 @@ class HostDir(object):
 		Returns:
 		  A kubernetes.HostDir instance
 		'''
+		import pdb; pdb.set_trace()  # XXX BREAKPOINT
 		return HostDir(Path=data.get('path', None))
 
 
@@ -339,7 +340,7 @@ class EmptyDir(object):
 
 	def AsJsonString(self):
 		'''A JSON string representation of this kubernetes.EmptyDir instance.
-	
+
 		Returns:
 		  A JSON string representation of this kubernetes.EmptyDir instance.
 		'''
@@ -378,7 +379,7 @@ class Protocol(object):
 
 class Port(object):
 	"""A Class representing the Port structure used by the kubernetes API
-	
+
 	Port represents a network port in a single container.
 
 	The Port structure exposes the following properties:
@@ -392,7 +393,7 @@ class Port(object):
 	"""
 	def __init__(self, **kwargs):
 		'''An object to hold a Kubernete Port.
-		
+
 		Arg:
 		 Name:
 		 	Optional: If specified, this must be a DNS_LABEL.  Each named port
@@ -406,7 +407,7 @@ class Port(object):
 		 HostIP:
 		 	Optional: What host IP to bind the external port to.
 		'''
-		
+
 		param_defaults = {
 			'Name': 					None,
 			'HostPort': 				None,
@@ -443,7 +444,7 @@ class Port(object):
 
 	def AsJsonString(self):
 		'''A JSON string representation of this kubernetes.Port instance.
-	
+
 		Returns:
 		  A JSON string representation of this kubernetes.Port instance.
 		'''
@@ -486,7 +487,7 @@ class Port(object):
 
 class GCEPersistentDisk(object):
 	"""A Class representing the GCEPersistentDisk structure used by the kubernetes API
-	
+
 	GCEPersistent Disk resource.
 	A GCE PD must exist before mounting to a container. The disk must
 	also be in the same GCE project and zone as the kubelet.
@@ -502,7 +503,7 @@ class GCEPersistentDisk(object):
 	"""
 	def __init__(self, **kwargs):
 		'''An object to hold a Kubernete GCEPersistentDisk.
-		
+
 		Arg:
 		 PDName:
 		 	Unique name of the PD resource. Used to identify the disk in GCE
@@ -519,7 +520,7 @@ class GCEPersistentDisk(object):
 		 	Optional: Defaults to false (read/write). ReadOnly here will force
 			the ReadOnly setting in VolumeMounts.
 		'''
-		
+
 		param_defaults = {
 			'PDName': 					None,
 			'FSType': 					None,
@@ -554,7 +555,7 @@ class GCEPersistentDisk(object):
 
 	def AsJsonString(self):
 		'''A JSON string representation of this kubernetes.GCEPersistentDisk instance.
-	
+
 		Returns:
 		  A JSON string representation of this kubernetes.GCEPersistentDisk instance.
 		'''
@@ -595,7 +596,7 @@ class GCEPersistentDisk(object):
 
 class VolumeMount(object):
 	"""A Class representing the VolumeMount structure used by the kubernetes API
-	
+
 	VolumeMount describes a mounting of a Volume within a container.
 
 	The VolumeMount structure exposes the following properties:
@@ -607,7 +608,7 @@ class VolumeMount(object):
 	"""
 	def __init__(self, **kwargs):
 		'''An object to hold a Kubernete VolumeMount.
-		
+
 		Arg:
 		 Name:
 		 	Required: This must match the Name of a Volume [above].
@@ -616,7 +617,7 @@ class VolumeMount(object):
 	 	 MountPath:
 		 	Required.
 		'''
-		
+
 		param_defaults = {
 			'Name': 					None,
 			'Readonly': 				False,
@@ -649,7 +650,7 @@ class VolumeMount(object):
 
 	def AsJsonString(self):
 		'''A JSON string representation of this kubernetes.VolumeMount instance.
-	
+
 		Returns:
 		  A JSON string representation of this kubernetes.VolumeMount instance.
 		'''

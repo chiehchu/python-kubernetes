@@ -6,7 +6,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#	 http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,7 @@ from kubernetes import simplejson
 
 class ContainerManifest(object):
 	"""A Class representing the ContainerManifest structure used by the kubernetes API
-	
+
 	ContainerManifest corresponds to the Container Manifest format, documented at:
 	https://developers.google.com/compute/docs/containers/container_vms#container_manifest
 	This is used as the representation of Kubernetes workloads.
@@ -36,7 +36,7 @@ class ContainerManifest(object):
 	"""
 	def __init__(self, **kwargs):
 		'''An object to hold a Kubernete ContainerManifest.
-		
+
 		Arg:
 		 Version:
 		 	Required: This must be a supported version string, such as "v1beta1".
@@ -51,7 +51,7 @@ class ContainerManifest(object):
 		 Containers:
 		 RestartPolicy:
 		'''
-		
+
 		param_defaults = {
 			'Version': 							None,
 			'ID': 								None,
@@ -90,7 +90,7 @@ class ContainerManifest(object):
 
 	def AsJsonString(self):
 		'''A JSON string representation of this kubernetes.ContainerManifest instance.
-	
+
 		Returns:
 		  A JSON string representation of this kubernetes.ContainerManifest instance.
 		'''
@@ -155,7 +155,7 @@ class ContainerManifest(object):
 from kubernetes import TypeMeta
 class ContainerManifestList(TypeMeta):
 	"""A Class representing the ContainerManifestList structure used by the kubernetes API
-	
+
 	ContainerManifestList is used to communicate container manifests to kubelet.
 	DEPRECATED: Replaced with BoundPods
 
@@ -166,11 +166,11 @@ class ContainerManifestList(TypeMeta):
 	"""
 	def __init__(self, **kwargs):
 		'''An object to hold a Kubernete ContainerManifestList.
-		
+
 		Arg:
 		 Items:
 		'''
-		
+
 		param_defaults = {
 			'Items': 							None}
 
@@ -202,7 +202,7 @@ class ContainerManifestList(TypeMeta):
 
 	def AsJsonString(self):
 		'''A JSON string representation of this kubernetes.ContainerManifestList instance.
-	
+
 		Returns:
 		  A JSON string representation of this kubernetes.ContainerManifestList instance.
 		'''
@@ -253,7 +253,7 @@ class ContainerManifestList(TypeMeta):
 
 class PodSpec(object):
 	"""A Class representing the PodSpec structure used by the kubernetes API
-	
+
 	PodSpec is a description of a pod
 
 	The PodSpec structure exposes the following properties:
@@ -265,13 +265,13 @@ class PodSpec(object):
 	"""
 	def __init__(self, **kwargs):
 		'''An object to hold a Kubernete PodSpec.
-		
+
 		Arg:
 		 Volumes:
 		 Containers:
 		 RestartPolicy:
 		'''
-		
+
 		param_defaults = {
 			'Volumes': 							None,
 			'Containers': 						None,
@@ -304,7 +304,7 @@ class PodSpec(object):
 
 	def AsJsonString(self):
 		'''A JSON string representation of this kubernetes.PodSpec instance.
-	
+
 		Returns:
 		  A JSON string representation of this kubernetes.PodSpec instance.
 		'''
@@ -360,7 +360,7 @@ class PodSpec(object):
 
 class BoundPod(TypeMeta):
 	"""A Class representing the BoundPod structure used by the kubernetes API
-	
+
 	BoundPod is a collection of containers that should be run on a host. A BoundPod
 	defines how a Pod may change after a Binding is created. A Pod is a request to
 	execute a pod, whereas a BoundPod is the specification that would be run on a server.
@@ -372,12 +372,12 @@ class BoundPod(TypeMeta):
 	"""
 	def __init__(self, **kwargs):
 		'''An object to hold a Kubernete BoundPod.
-		
+
 		Arg:
 		 Spec:
 		 	Spec defines the behavior of a pod.
 		'''
-		
+
 		param_defaults = {
 			'Spec': 							None}
 
@@ -409,7 +409,7 @@ class BoundPod(TypeMeta):
 
 	def AsJsonString(self):
 		'''A JSON string representation of this kubernetes.BoundPod instance.
-	
+
 		Returns:
 		  A JSON string representation of this kubernetes.BoundPod instance.
 		'''
@@ -459,7 +459,7 @@ class BoundPod(TypeMeta):
 
 class BoundPods(TypeMeta):
 	"""A Class representing the BoundPods structure used by the kubernetes API
-	
+
 	BoundPods is a list of Pods bound to a common server. The resource version of
 	the pod list is guaranteed to only change when the list of bound pods changes.
 
@@ -471,14 +471,14 @@ class BoundPods(TypeMeta):
 	"""
 	def __init__(self, **kwargs):
 		'''An object to hold a Kubernete BoundPods.
-		
+
 		Arg:
 		 Host:
 		 	Host is the name of a node that these pods were bound to.
 		 Items:
 		 	Items is the list of all pods bound to a given host.
 		'''
-		
+
 		param_defaults = {
 			'Host': 							None,
 			'Items': 							None}
@@ -512,7 +512,7 @@ class BoundPods(TypeMeta):
 
 	def AsJsonString(self):
 		'''A JSON string representation of this kubernetes.BoundPods instance.
-	
+
 		Returns:
 		  A JSON string representation of this kubernetes.BoundPods instance.
 		'''
