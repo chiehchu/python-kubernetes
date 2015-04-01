@@ -23,7 +23,7 @@ import urlparse
 import requests
 
 import urllib3
-urllib3.disable_warnings()
+#urllib3.disable_warnings()
 
 from kubernetes import (__version__, _FileCache, simplejson, KubernetesError, PodList)
 
@@ -80,12 +80,12 @@ class Api(object):
 		else:
 			self.base_url = base_url
 
-		if user_id is None or user_password is None:
-			print >> sys.stderr, 'Kubernetes requires user_id, user_password.'
+		#if user_id is None or user_password is None:
+			#print >> sys.stderr, 'Kubernetes requires user_id, user_password.'
 
-			raise KubernetesError({'message': "Kubernetes requires user_id and user_password"})
+			#raise KubernetesError({'message': "Kubernetes requires user_id and user_password"})
 
-		self.SetCredentials(user_id, user_password)
+		#self.SetCredentials(user_id, user_password)
 
 		if debugHTTP:
 			import logging
@@ -125,7 +125,7 @@ class Api(object):
 
 	def GetPods(self):
 		'''List all pods on this cluster'''
-		
+
 		# Make and send requests
 		url = '%s/pods' % self.base_url
 		json = self._RequestUrl(url, 'GET')
@@ -134,16 +134,16 @@ class Api(object):
 
 	def GetReplicationControllers(self):
 		'''List all replicationControllers on this cluster'''
-		
+
 		# Make and send requests
-		url = '%s/replicationControllers' % self.base_url
+		url = '%s/replicationcontrollers' % self.base_url
 		json = self._RequestUrl(url, 'GET')
 		data = self._ParseAndCheckKubernetes(json.content)
 		return PodList.NewFromJsonDict(data)
 
 	def GetServices(self):
 		'''List all services on this cluster'''
-		
+
 		# Make and send requests
 		url = '%s/services' % self.base_url
 		json = self._RequestUrl(url, 'GET')
@@ -167,7 +167,7 @@ class Api(object):
 			self._request_headers = request_headers
 		else:
 			self._request_headers = {}
-	
+
 	def _InitializeUserAgent(self):
 		user_agent = 'Python-urllib/%s (python-kubernetes/%s)' % \
 			(self._urllib.__version__, __version__)
@@ -193,7 +193,7 @@ class Api(object):
 
 	def _EncodeParameters(self, parameters):
 		'''Return a string in key=value&key=value form
-			
+
 		Value of None are not included in the output string.
 
 		Args:
@@ -236,7 +236,7 @@ class Api(object):
 
 	def _RequestUrl(self, url, verb, data=None):
 		'''Request a url.
-		
+
 			Args:
 			 url:
 			 	The web location we want to retrieve.
@@ -253,7 +253,7 @@ class Api(object):
 				return requests.post(
 					url,
 					data=data,
-					auth=self.__auth,
+					auth=None,
 					timeout=self._timeout,
 					verify=False
 					)
@@ -263,7 +263,7 @@ class Api(object):
 			try:
 				return requests.get(
 					url,
-					auth=self.__auth,
+					auth=None,
 					timeout=self._timeout,
 					verify=False
 					)
@@ -274,7 +274,7 @@ class Api(object):
 				return requests.put(
 					url,
 					data=data,
-					auth=self.__auth,
+					auth=None,
 					timeout=self._timeout,
 					verify=False
 					)
@@ -284,13 +284,13 @@ class Api(object):
 			try:
 				return requests.get(
 					url,
-					auth=self.__auth,
+					auth=None,
 					timeout=self._timeout,
 					verify=False
 					)
 			except requests.RequestException as e:
 				raise KubernetesError(str(e))
-		return 0 
+		return 0
 
 	def _ParseAndCheckKubernetes(self, json):
 		'''Try and parse the JSON returned from Kubernetes and return

@@ -80,46 +80,47 @@ class KubernetesRc(object):
     return value
 
 def main():
-  try:
-    shortflags = 'h'
-    longflags = ['help', 'user-id=', 'user-pw=', 'url=', 'encoding=']
-    opts, args = getopt.gnu_getopt(sys.argv[1:], shortflags, longflags)
-  except getopt.GetoptError:
-    PrintUsageAndExit()
+  #try:
+    #shortflags = 'h'
+    #longflags = ['help', 'user-id=', 'user-pw=', 'url=', 'encoding=']
+    #opts, args = getopt.gnu_getopt(sys.argv[1:], shortflags, longflags)
+  #except getopt.GetoptError:
+    #PrintUsageAndExit()
   user_idflag = None
   user_passwordflag = None
   encoding = None
   url = None
-  for o, a in opts:
-    if o in ("-h", "--help"):
-      PrintUsageAndExit()
-    if o in ("--user-id"):
-      user_idflag = a
-    if o in ("--user-pw"):
-      user_passwordflag = a
-    if o in ("--encoding"):
-      encoding = a
-    if o in ("--url"):
-      url = a
+  #for o, a in opts:
+    #if o in ("-h", "--help"):
+      #PrintUsageAndExit()
+    #if o in ("--user-id"):
+      #user_idflag = a
+    #if o in ("--user-pw"):
+      #user_passwordflag = a
+    #if o in ("--encoding"):
+      #encoding = a
+    #if o in ("--url"):
+      #url = a
 
-  if url is None:
-    PrintUsageAndExit()
+  #if url is None:
+    #PrintUsageAndExit()
 
   rc = KubernetesRc()
-  user_id = user_idflag or GetUserIDKeyEnv() or rc.GetUserIdKey()
-  user_password = user_passwordflag or GetUserPasswordEnv() or rc.GetUserPasswordKey()
+  #user_id = user_idflag or GetUserIDKeyEnv() or rc.GetUserIdKey()
+  #user_password = user_passwordflag or GetUserPasswordEnv() or rc.GetUserPasswordKey()
 
-  print user_id
-  print user_password
-  
-  if not user_id or not user_password:
-    PrintUsageAndExit()
+  #print user_id
+  #print user_password
 
-  api = kubernetes.Api(user_id=user_id, user_password=user_password,
+  #if not user_id or not user_password:
+    #PrintUsageAndExit()
+
+  api = kubernetes.Api(user_id=None, user_password=None,
                     input_encoding=encoding,
-                    base_url=url,
+                    base_url='http://172.30.30.71:8080/api/v1beta3',
                     debugHTTP=True)
   try:
+    import pdb; pdb.set_trace()  # XXX BREAKPOINT
     pod_list = api.GetPods()
   except UnicodeDecodeError:
     print "Error!! "
