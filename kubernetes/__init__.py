@@ -22,9 +22,9 @@ __version__ = '0.1'
 import json as simplejson
 
 try:
-	from hashlib import md5
+    from hashlib import md5
 except ImportError:
-	from md5 import md5
+    from md5 import md5
 
 from _file_cache import _FileCache
 from error import KubernetesError

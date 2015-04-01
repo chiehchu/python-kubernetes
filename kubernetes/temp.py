@@ -19,11 +19,11 @@
 import httplib2
 
 def main():
-	# h = httplib2.Http(ca_certs='kubernetes.invalid.pem')
-	h = httplib2.Http(".cache", disable_ssl_certificate_validation=True)
-	h.add_credentials('vagrant', 'vagrant') # Basic authentication
-	resp, content = h.request("https://10.245.1.2/api/v1beta1/pods", "GET")
-	print content
+    # h = httplib2.Http(ca_certs='kubernetes.invalid.pem')
+    h = httplib2.Http(".cache", disable_ssl_certificate_validation=True)
+    h.add_credentials('vagrant', 'vagrant') # Basic authentication
+    resp, content = h.request("https://10.245.1.2/api/v1beta1/pods", "GET")
+    print content
 
 if __name__ == '__main__':
-	main()
+    main()

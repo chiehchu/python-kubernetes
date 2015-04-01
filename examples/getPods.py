@@ -117,10 +117,9 @@ def main():
 
   api = kubernetes.Api(user_id=None, user_password=None,
                     input_encoding=encoding,
-                    base_url='http://172.30.30.71:8080/api/v1beta3',
+                    base_url='http://172.30.30.71:8080/api/v1beta2',
                     debugHTTP=True)
   try:
-    import pdb; pdb.set_trace()  # XXX BREAKPOINT
     pod_list = api.GetPods()
   except UnicodeDecodeError:
     print "Error!! "
