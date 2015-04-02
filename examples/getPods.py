@@ -82,7 +82,7 @@ class KubernetesRc(object):
 def main():
   try:
     shortflags = 'h'
-    longflags = ['help', 'version=', 'host=', 'namespace=', 'user-id=', 'user-pw=', 'url=', 'encoding=']
+    longflags = ['help', 'rc-data=', 'pod-data=', 'service-data=', 'version=', 'host=', 'namespace=', 'user-id=', 'user-pw=', 'url=', 'encoding=']
     opts, args = getopt.gnu_getopt(sys.argv[1:], shortflags, longflags)
   except getopt.GetoptError:
     PrintUsageAndExit()
@@ -93,6 +93,9 @@ def main():
   namespace = None
   version = 'v1beta3'
   host = '172.30.10.185'
+  rc_data = None
+  service_data = None
+  pod_data = None
   for o, a in opts:
     #if o in ("-h", "--help"):
       #PrintUsageAndExit()
@@ -110,6 +113,12 @@ def main():
       host = a
     if o in ("--version"):
       version = a
+    if o in ("--pod-data"):
+      pod_data= a
+    if o in ("--rc-data"):
+      rc_data= a
+    if o in ("--service-data"):
+      service_data= a
   #if url is None:
     #PrintUsageAndExit()
 
@@ -128,6 +137,20 @@ def main():
                     input_encoding=encoding,
                     base_url=_gen_url(host, version),
                     debugHTTP=True)
+
+
+  #try create first
+
+  if rc_data:
+    f = open(rc_data)
+    content = f.read()
+    api.CreateRc(data=content, namespace=namespace)
+
+  if service_data:
+    f = open(service_data)
+    content = f.read()
+    api.CreateService(data=content, namespace=namespace)
+
   try:
     pod_list = api.GetPods(namespace=namespace)
   except UnicodeDecodeError:

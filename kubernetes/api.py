@@ -123,10 +123,32 @@ class Api(object):
         self._user_id = None
         self._user_password = None
 
+    def CreateService(self, data, namespace='default'):
+        '''Create a new Service'''
+
+        url = ('%(base_url)s/namespaces/%(ns)s/services' %
+               {"base_url":self.base_url, "ns":namespace})
+        json = self._RequestUrl(url, 'POST', data)
+        if json.status_code is not 201:
+            raise KubernetesError({'message': 'parsing error ['+simplejson.dumps(json.content)+']'})
+
+    def CreateRc(self, data, namespace='default'):
+        '''Create a new ReplicationController'''
+
+        url = ('%(base_url)s/namespaces/%(ns)s/replicationcontrollers' %
+               {"base_url":self.base_url, "ns":namespace})
+        json = self._RequestUrl(url, 'POST', data)
+        if json.status_code is not 201:
+            raise KubernetesError({'message': 'parsing error ['+simplejson.dumps(json.content)+']'})
+
     def CreatePod(self, data, namespace='default'):
         '''Create a new Pod'''
 
-        url = '%s/'
+        url = ('%(base_url)s/namespaces/%(ns)s/pods' %
+               {"base_url":self.base_url, "ns":namespace})
+        json = self._RequestUrl(url, 'PUT', data)
+        if json.status_code is not 201:
+            raise KubernetesError({'message': 'parsing error ['+simplejson.dumps(json.content)+']'})
 
     def GetPods(self, namespace=None):
         '''List all pods on this cluster'''

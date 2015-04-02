@@ -1,7 +1,7 @@
 .pypirc
 
 *.py[co]
-
+rc_data
 # Packages
 *.egg
 *.egg-info
