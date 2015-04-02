@@ -25,7 +25,7 @@ import requests
 import urllib3
 #urllib3.disable_warnings()
 
-from kubernetes import (__version__, _FileCache, simplejson, KubernetesError, PodList)
+from kubernetes import (__version__, _FileCache, simplejson, KubernetesError, PodList, ReplicationControllerList, ServiceList)
 
 # A singleton representing a lazily instantiated FileCache.
 DEFAULT_CACHE = object()
@@ -141,14 +141,18 @@ class Api(object):
         data = self._ParseAndCheckKubernetes(json.content)
         return PodList.NewFromJsonDict(data)
 
-    def GetReplicationControllers(self):
-        '''List all replicationControllers on this cluster'''
+    def GetReplicationControllers(self, namespace=None):
+        '''List all replicationcontrollers on this cluster'''
 
         # Make and send requests
-        url = '%s/replicationControllers' % self.base_url
+        if namespace:
+            url = ('%(base_url)s/namespaces/%(ns)s/replicationcontrollers' %
+                {"base_url":self.base_url, "ns":namespace})
+        else:
+            url = '%s/replicationcontrollers' % self.base_url
         json = self._RequestUrl(url, 'GET')
         data = self._ParseAndCheckKubernetes(json.content)
-        return PodList.NewFromJsonDict(data)
+        return ReplicationControllerList.NewFromJsonDict(data)
 
     def GetServices(self):
         '''List all services on this cluster'''
@@ -157,7 +161,7 @@ class Api(object):
         url = '%s/services' % self.base_url
         json = self._RequestUrl(url, 'GET')
         data = self._ParseAndCheckKubernetes(json.content)
-        return PodList.NewFromJsonDict(data)
+        return ServiceList.NewFromJsonDict(data)
 
     def SetCache(self, cache):
         '''Override the default cache.  Set to None to prevent caching.

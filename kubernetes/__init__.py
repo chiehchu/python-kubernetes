@@ -34,7 +34,7 @@ from volume import Port, Volume, HostDir, EmptyDir, GCEPersistentDisk, VolumeMou
 from container import Handler, Lifecyle, Container
 from container_status import TypeMeta, ContainerState, ContainerStatus, ContainerStateWaiting, ContainerStateRunning, ContainerStateTerminated
 from manifest import ContainerManifest, PodSpec, BoundPod, BoundPods, ContainerManifestList
-from pod import RestartPolicy, PodState, PodTemplate, RestartPolicyAlways, RestartPolicyNever, Pod, ReplicationControllerState, RestartPolicyOnFailure, PodList, ReplicationController, ReplicationControllerList
+from pod import RestartPolicy, PodState, PodTemplate, RestartPolicyAlways, RestartPolicyNever, Pod, ReplicationControllerSpec, RestartPolicyOnFailure, PodList, ReplicationController, ReplicationControllerList
 from service import Service, Endpoints, ServiceList, EndpointsList
 from minion import NodeResources, Minion, Binding, MinionList
 from status import StatusDetails, StatusCause, Status

@@ -506,7 +506,7 @@ class PodList(TypeMeta):
         '''
 
         items = None
-        metadata = data.get('metadata', None)
+        metadata = data.get('metadata')
 
         if 'items' in data and data['items']:
             from kubernetes import Pod
@@ -655,20 +655,20 @@ class Pod(TypeMeta):
                     CurrentState=currentState)
 
 
-class ReplicationControllerState(object):
-    """A Class representing the ReplicationControllerState structure used by the kubernetes API
+class ReplicationControllerSpec(object):
+    """A Class representing the ReplicationControllerSpec structure used by the kubernetes API
 
-    ReplicationControllerState is the state of a pod, used as either input (desired state) or output (current state).
+    ReplicationControllerSpec is the state of a pod, used as either input (desired state) or output (current state).
 
-    The ReplicationControllerState structure exposes the following properties:
+    The ReplicationControllerSpec structure exposes the following properties:
 
-    ReplicationControllerState.Replicas
-    ReplicationControllerState.ReplicaSelector
-    ReplicationControllerState.PodTemplate
+    ReplicationControllerSpec.Replicas
+    ReplicationControllerSpec.ReplicaSelector
+    ReplicationControllerSpec.PodTemplate
 
     """
     def __init__(self, **kwargs):
-        '''An object to hold a Kubernete ReplicationControllerState.
+        '''An object to hold a Kubernete ReplicationControllerSpec.
 
         Arg:
          Replicas:
@@ -699,36 +699,36 @@ class ReplicationControllerState(object):
             return False
 
     def __str__(self):
-        '''A string representation of this Kubernetes.ReplicationControllerState instance.
+        '''A string representation of this Kubernetes.ReplicationControllerSpec instance.
 
         The return value is the same as the JSON string representation.
 
         Returns:
-         A string representation of this kubernetes.ReplicationControllerState instance.
+         A string representation of this kubernetes.ReplicationControllerSpec instance.
         '''
         return self.AsJsonString()
 
     def AsJsonString(self):
-        '''A JSON string representation of this kubernetes.ReplicationControllerState instance.
+        '''A JSON string representation of this kubernetes.ReplicationControllerSpec instance.
 
         Returns:
-          A JSON string representation of this kubernetes.ReplicationControllerState instance.
+          A JSON string representation of this kubernetes.ReplicationControllerSpec instance.
         '''
         return simplejson.dumps(self.AsDict(), sort_keys=True)
 
     def AsDict(self):
-        ''' A dic representation of this kubernetes.ReplicationControllerState instance.
+        ''' A dic representation of this kubernetes.ReplicationControllerSpec instance.
 
         The return values uses the same key names as the JSON representation.
 
         Returns:
-          A dict representing this kubernetes.ReplicationControllerState instance
+          A dict representing this kubernetes.ReplicationControllerSpec instance
         '''
         data = {}
         if self.Replicas:
             data['replicas'] = self.Replicas
         if self.ReplicaSelector:
-            data['replicaSelector'] = self.ReplicaSelector
+            data['selector'] = self.ReplicaSelector
         if self.PodTemplate:
             data['podTemplate'] = self.PodTemplate.AsDict()
         return data
@@ -739,17 +739,18 @@ class ReplicationControllerState(object):
         Args:
           data: A JSON dict, as converted from the JSON in the kubernetes API
         Returns:
-          A kubernetes.ReplicationControllerState instance
+          A kubernetes.ReplicationControllerSpec instance
         '''
 
         podTemplate = None
+        selector = data.get('selector')
         if 'podTemplate' in data:
             from kubernetes import PodTemplate
             podTemplate = PodTemplate.NewFromJsonDict(data['podTemplate'])
 
-        return ReplicationControllerState(
+        return ReplicationControllerSpec(
                     Replicas=data.get('replicas', None),
-                    ReplicaSelector=data.get('replicaSelector', None),
+                    ReplicaSelector=selector.get('name', None),
                     PodTemplate=podTemplate)
 
 
@@ -807,7 +808,7 @@ class ReplicationControllerList(TypeMeta):
         Returns:
           A JSON string representation of this kubernetes.ReplicationControllerList instance.
         '''
-        return simplejson.dumps(dict(self.AsDict().items()+super(PodList, self).AsDict().items()), sort_keys=True)
+        return simplejson.dumps(dict(self.AsDict().items()+super(ReplicationControllerList, self).AsDict().items()), sort_keys=True)
 
     def AsDict(self):
         ''' A dic representation of this kubernetes.ReplicationControllerList instance.
@@ -832,6 +833,7 @@ class ReplicationControllerList(TypeMeta):
         '''
 
         items = None
+        metadata = data.get('metadata')
 
         if 'items' in data:
             from kubernetes import ReplicationController
@@ -839,14 +841,14 @@ class ReplicationControllerList(TypeMeta):
 
         return ReplicationControllerList(
                     Kind=data.get('kind', None),
-                    ID=data.get('id', None),
-                    UID=data.get('uid', None),
-                    CreationTimestamp=data.get('creationTimestamp', None),
-                    SelfLink=data.get('selfLink', None),
-                    ResourceVersion=data.get('resourceVersion', None),
                     APIVersion=data.get('apiVersion', None),
-                    Namespace=data.get('namespace', None),
-                    Annotations=data.get('annotations', None),
+                    Name=metadata.get('name', None),
+                    UID=metadata.get('uid', None),
+                    CreationTimestamp=metadata.get('creationTimestamp', None),
+                    SelfLink=metadata.get('selfLink', None),
+                    ResourceVersion=metadata.get('resourceVersion', None),
+                    Namespace=metadata.get('namespace', None),
+                    Annotations=metadata.get('annotations', None),
 
                     Items=items)
 
@@ -877,6 +879,7 @@ class ReplicationController(TypeMeta):
         param_defaults = {
             'DesiredState':                             None,
             'CurrentState':                             None,
+            'Spec':                             None,
             'Labels':                                     None}
 
         for (param, default) in param_defaults.iteritems():
@@ -893,6 +896,7 @@ class ReplicationController(TypeMeta):
             self.DesiredState == other.DesiredState and \
             self.CurrentState == other.CurrentState and \
             self.Labels == other.Labels and \
+            self.Spec == other.Spec and \
             super(ReplicationController, self).__eq__(other)
         except AttributeError:
             return False
@@ -913,7 +917,7 @@ class ReplicationController(TypeMeta):
         Returns:
           A JSON string representation of this kubernetes.ReplicationController instance.
         '''
-        return simplejson.dumps(dict(self.AsDict().items()+super(PodList, self).AsDict().items()), sort_keys=True)
+        return simplejson.dumps(dict(self.AsDict().items()+super(ReplicationController, self).AsDict().items()), sort_keys=True)
 
     def AsDict(self):
         ''' A dic representation of this kubernetes.ReplicationController instance.
@@ -923,13 +927,15 @@ class ReplicationController(TypeMeta):
         Returns:
           A dict representing this kubernetes.ReplicationController instance
         '''
-        data = {}
+        data = super(ReplicationController, self).AsDict()
         if self.DesiredState:
-            data['desiredState'] = self.DesiredState.AsDict()
+            data['desiredState'] = self.DesiredState
         if self.CurrentState:
-            data['currentState'] = self.CurrentState.AsDict()
+            data['currentState'] = self.CurrentState
         if self.Labels:
             data['labels'] = self.Labels
+        if self.Spec:
+            data['spec'] = self.Spec.AsDict()
         return data
 
     @staticmethod
@@ -943,20 +949,38 @@ class ReplicationController(TypeMeta):
 
         desiredState = None
         currentState = None
+        metadata = data.get('metadata')
 
         if 'desiredState' in data:
-            from kubernetes import ReplicationControllerState
-            desiredState = ReplicationControllerState.NewFromJsonDict(data['desiredState'])
+            from kubernetes import ReplicationControllerSpec
+            desiredState = ReplicationControllerSpec.NewFromJsonDict(data['desiredState'])
 
         if 'currentState' in data:
-            from kubernetes import ReplicationControllerState
-            currentState = ReplicationControllerState.NewFromJsonDict(data['currentState'])
+            from kubernetes import ReplicationControllerSpec
+            currentState = ReplicationControllerSpec.NewFromJsonDict(data['currentState'])
 
+        if 'spec' in data:
+            from kubernetes import ReplicationControllerSpec
+            spec = ReplicationControllerSpec.NewFromJsonDict(data['spec'])
+            if spec.Replicas:
+                desiredState = spec.Replicas
 
+        if 'status' in data and 'replicas' in data['status']:
+            currentState = data['status'].get('replicas')
         return ReplicationController(
+                    Spec=spec,
+                    Kind=data.get('kind', None),
+                    APIVersion=data.get('apiVersion', None),
+                    Name=metadata.get('name', None),
+                    UID=metadata.get('uid', None),
+                    CreationTimestamp=metadata.get('creationTimestamp', None),
+                    SelfLink=metadata.get('selfLink', None),
+                    ResourceVersion=metadata.get('resourceVersion', None),
+                    Namespace=metadata.get('namespace', None),
+                    Annotations=metadata.get('annotations', None),
+                    Labels=metadata.get('labels', None),
                     DesiredState=desiredState,
-                    CurrentState=currentState,
-                    Labels=data.get('labels', None))
+                    CurrentState=currentState)
 
 class PodTemplate(object):
     """A Class representing the PodTemplate structure used by the kubernetes API
