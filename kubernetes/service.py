@@ -19,7 +19,7 @@ from kubernetes import simplejson
 from kubernetes import TypeMeta
 class ServiceList(TypeMeta):
     """A Class representing the ServiceList structure used by the kubernetes API
-    
+
     ServiceList holds a list of services.
 
     The ServiceList structure exposes the following properties:
@@ -29,13 +29,13 @@ class ServiceList(TypeMeta):
     """
     def __init__(self, **kwargs):
         '''An object to hold a Kubernete ServiceList.
-        
+
         Arg:
-         
+
          Items:
-         
+
         '''
-        
+
         param_defaults = {
             'Items':                     None}
 
@@ -67,7 +67,7 @@ class ServiceList(TypeMeta):
 
     def AsJsonString(self):
         '''A JSON string representation of this kubernetes.ServiceList instance.
-    
+
         Returns:
           A JSON string representation of this kubernetes.ServiceList instance.
         '''
@@ -96,6 +96,7 @@ class ServiceList(TypeMeta):
         '''
 
         items = None
+        metadata = data.get('metadata')
 
         if 'items' in data and data['items']:
             from kubernetes import Service
@@ -103,20 +104,20 @@ class ServiceList(TypeMeta):
 
         return ServiceList(
                     Kind=data.get('kind', None),
-                    ID=data.get('id', None),
-                    UID=data.get('uid', None),
-                    CreationTimestamp=data.get('creationTimestamp', None),
-                    SelfLink=data.get('selfLink', None),
-                    ResourceVersion=data.get('resourceVersion', None),
                     APIVersion=data.get('apiVersion', None),
-                    Namespace=data.get('namespace', None),
-                    Annotations=data.get('annotations', None),
+                    Name=metadata.get('name', None),
+                    UID=metadata.get('uid', None),
+                    CreationTimestamp=metadata.get('creationTimestamp', None),
+                    SelfLink=metadata.get('selfLink', None),
+                    ResourceVersion=metadata.get('resourceVersion', None),
+                    Namespace=metadata.get('namespace', None),
+                    Annotations=metadata.get('annotations', None),
 
                     Items=items)
 
 class Service(TypeMeta):
     """A Class representing the Service structure used by the kubernetes API
-    
+
     Service is a named abstraction of software service (for example, mysql) consisting of local port
     (for example 3306) that the proxy listens on, and the selector that determines which pods
     will answer requests sent through the proxy.
@@ -135,9 +136,9 @@ class Service(TypeMeta):
     """
     def __init__(self, **kwargs):
         '''An object to hold a Kubernete Service.
-        
+
         Arg:
-         
+
          Port:
              Required.
          Protocol:
@@ -154,9 +155,9 @@ class Service(TypeMeta):
              PortalIP is assigned by the master.  If specified by the user it will be ignored.
          ProxyPort:
              ProxyPort is assigned by the master.  If specified by the user it will be ignored.
-         
+
         '''
-        
+
         param_defaults = {
             'Port':                                 None,
             'Protocol':                             None,
@@ -165,6 +166,7 @@ class Service(TypeMeta):
             'CreateExternalLoadBalancer':             None,
             'ContainerPort':                         None,
             'PortalIP':                             None,
+            'PublicIPs':                             None,
             'ProxyPort':                             None}
 
         for (param, default) in param_defaults.iteritems():
@@ -186,6 +188,7 @@ class Service(TypeMeta):
             self.ContainerPort == other.ContainerPort and \
             self.PortalIP == other.PortalIP and \
             self.ProxyPort == other.ProxyPort and \
+            self.PublicIPs == other.PublicIPs and \
             super(Service, self).__eq__(other)
         except AttributeError:
             return False
@@ -202,7 +205,7 @@ class Service(TypeMeta):
 
     def AsJsonString(self):
         '''A JSON string representation of this kubernetes.Service instance.
-    
+
         Returns:
           A JSON string representation of this kubernetes.Service instance.
         '''
@@ -216,7 +219,7 @@ class Service(TypeMeta):
         Returns:
           A dict representing this kubernetes.Service instance
         '''
-        data = {}
+        data = super(Service, self).AsDict()
         if self.Port:
             data['port'] = self.Port
         if self.Protocol:
@@ -233,6 +236,8 @@ class Service(TypeMeta):
             data['portalIP'] = self.PortalIP
         if self.ProxyPort:
             data['proxyPort'] = self.ProxyPort
+        if self.PublicIPs:
+            data['publicIPs'] = self.PublicIPs
         return data
 
     @staticmethod
@@ -243,31 +248,36 @@ class Service(TypeMeta):
         Returns:
           A kubernetes.Service instance
         '''
+        metadata = data.get('metadata')
+        spec = data.get('spec')
+        selector = spec.get('selector')
 
         return Service(
                     Kind=data.get('kind', None),
-                    ID=data.get('id', None),
-                    UID=data.get('uid', None),
-                    CreationTimestamp=data.get('creationTimestamp', None),
-                    SelfLink=data.get('selfLink', None),
-                    ResourceVersion=data.get('resourceVersion', None),
                     APIVersion=data.get('apiVersion', None),
-                    Namespace=data.get('namespace', None),
-                    Annotations=data.get('annotations', None),
+                    Name=metadata.get('name', None),
+                    UID=metadata.get('uid', None),
+                    CreationTimestamp=metadata.get('creationTimestamp', None),
+                    SelfLink=metadata.get('selfLink', None),
+                    ResourceVersion=metadata.get('resourceVersion', None),
+                    Namespace=metadata.get('namespace', None),
+                    Annotations=metadata.get('annotations', None),
 
-                    Port=data.get('port', None),
-                    Protocol=data.get('protocol', None),
-                    Labels=data.get('labels', None),
-                    Selector=data.get('selector', None),
-                    CreateExternalLoadBalancer=data.get('createExternalLoadBalancer', None),
-                    ContainerPort=data.get('containerPort', None),
-                    PortalIP=data.get('portalIP', None),
-                    ProxyPort=data.get('proxyPort', None))
+                    Selector=selector.get('name', None),
+
+                    PublicIPs=spec.get('publicIPs', None),
+                    Port=spec.get('port', None),
+                    Protocol=spec.get('protocol', None),
+                    Labels=spec.get('labels', None),
+                    CreateExternalLoadBalancer=spec.get('createExternalLoadBalancer', None),
+                    ContainerPort=spec.get('containerPort', None),
+                    PortalIP=spec.get('portalIP', None),
+                    ProxyPort=spec.get('proxyPort', None))
 
 
 class Endpoints(TypeMeta):
     """A Class representing the Endpoints structure used by the kubernetes API
-    
+
     Endpoints is a collection of endpoints that implement the actual service, for example:
     Name: "mysql", Endpoints: ["10.10.1.1:1909", "10.10.2.2:8834"]
 
@@ -278,13 +288,13 @@ class Endpoints(TypeMeta):
     """
     def __init__(self, **kwargs):
         '''An object to hold a Kubernete Endpoints.
-        
+
         Arg:
-         
+
          Endpoints:
-         
+
         '''
-        
+
         param_defaults = {
             'Endpoints':                     None}
 
@@ -316,7 +326,7 @@ class Endpoints(TypeMeta):
 
     def AsJsonString(self):
         '''A JSON string representation of this kubernetes.Endpoints instance.
-    
+
         Returns:
           A JSON string representation of this kubernetes.Endpoints instance.
         '''
@@ -359,7 +369,7 @@ class Endpoints(TypeMeta):
 
 class EndpointsList(TypeMeta):
     """A Class representing the EndpointsList structure used by the kubernetes API
-    
+
     EndpointsList is a list of endpoints.
 
     The EndpointsList structure exposes the following properties:
@@ -369,13 +379,13 @@ class EndpointsList(TypeMeta):
     """
     def __init__(self, **kwargs):
         '''An object to hold a Kubernete EndpointsList.
-        
+
         Arg:
-         
+
          Items:
-         
+
         '''
-        
+
         param_defaults = {
             'Items':                     None}
 
@@ -407,7 +417,7 @@ class EndpointsList(TypeMeta):
 
     def AsJsonString(self):
         '''A JSON string representation of this kubernetes.EndpointsList instance.
-    
+
         Returns:
           A JSON string representation of this kubernetes.EndpointsList instance.
         '''

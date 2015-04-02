@@ -154,11 +154,15 @@ class Api(object):
         data = self._ParseAndCheckKubernetes(json.content)
         return ReplicationControllerList.NewFromJsonDict(data)
 
-    def GetServices(self):
+    def GetServices(self, namespace=None):
         '''List all services on this cluster'''
 
         # Make and send requests
-        url = '%s/services' % self.base_url
+        if namespace:
+            url = ('%(base_url)s/namespaces/%(ns)s/services' %
+                {"base_url":self.base_url, "ns":namespace})
+        else:
+            url = '%s/services' % self.base_url
         json = self._RequestUrl(url, 'GET')
         data = self._ParseAndCheckKubernetes(json.content)
         return ServiceList.NewFromJsonDict(data)

@@ -133,7 +133,7 @@ def main():
   except UnicodeDecodeError:
     print "Error!! "
     sys.exit(2)
-  #print "GetPods: %s" % (pod_list.AsJsonString())
+  print "GetPods: %s" % (pod_list.AsJsonString())
 
   try:
     rc_list = api.GetReplicationControllers(namespace=namespace)
@@ -142,12 +142,12 @@ def main():
     sys.exit(2)
   print "GetReplicationControllers: %s" % (rc_list.AsJsonString())
 
-  #try:
-    #pod_list = api.GetServices()
-  #except UnicodeDecodeError:
-    #print "Error!! "
-    #sys.exit(2)
-  #print "GetServices: %s" % (pod_list.AsJsonString())
+  try:
+    srv_list = api.GetServices(namespace=namespace)
+  except UnicodeDecodeError:
+    print "Error!! "
+    sys.exit(2)
+  print "GetServices: %s" % (srv_list.AsJsonString())
 
 if __name__ == "__main__":
   main()
