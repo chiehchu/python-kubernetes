@@ -80,17 +80,20 @@ class KubernetesRc(object):
     return value
 
 def main():
-  #try:
-    #shortflags = 'h'
-    #longflags = ['help', 'user-id=', 'user-pw=', 'url=', 'encoding=']
-    #opts, args = getopt.gnu_getopt(sys.argv[1:], shortflags, longflags)
-  #except getopt.GetoptError:
-    #PrintUsageAndExit()
+  try:
+    shortflags = 'h'
+    longflags = ['help', 'version=', 'host=', 'namespace=', 'user-id=', 'user-pw=', 'url=', 'encoding=']
+    opts, args = getopt.gnu_getopt(sys.argv[1:], shortflags, longflags)
+  except getopt.GetoptError:
+    PrintUsageAndExit()
   user_idflag = None
   user_passwordflag = None
   encoding = None
   url = None
-  #for o, a in opts:
+  namespace = None
+  version = 'v1beta3'
+  host = '172.30.10.185'
+  for o, a in opts:
     #if o in ("-h", "--help"):
       #PrintUsageAndExit()
     #if o in ("--user-id"):
@@ -101,7 +104,12 @@ def main():
       #encoding = a
     #if o in ("--url"):
       #url = a
-
+    if o in ("--namespace"):
+      namespace = a
+    if o in ("--host"):
+      host = a
+    if o in ("--version"):
+      version = a
   #if url is None:
     #PrintUsageAndExit()
 
@@ -114,13 +122,14 @@ def main():
 
   #if not user_id or not user_password:
     #PrintUsageAndExit()
-
+  def _gen_url(host, version):
+      return 'http://%s:8080/api/%s' % (host, version)
   api = kubernetes.Api(user_id=None, user_password=None,
                     input_encoding=encoding,
-                    base_url='http://172.30.10.185:8080/api/v1beta3',
+                    base_url=_gen_url(host, version),
                     debugHTTP=True)
   try:
-    pod_list = api.GetPods()
+    pod_list = api.GetPods(namespace=namespace)
   except UnicodeDecodeError:
     print "Error!! "
     sys.exit(2)
