@@ -25,7 +25,16 @@ import requests
 import urllib3
 #urllib3.disable_warnings()
 
-from kubernetes import (__version__, _FileCache, simplejson, KubernetesError, PodList, ReplicationControllerList, ServiceList)
+from kubernetes import (__version__,
+                        _FileCache,
+                        simplejson,
+                        KubernetesError,
+                        PodList,
+                        ReplicationControllerList,
+                        ServiceList,
+                        ReplicationController,
+                        Pod,
+                        Service)
 
 # A singleton representing a lazily instantiated FileCache.
 DEFAULT_CACHE = object()
@@ -123,6 +132,33 @@ class Api(object):
         self._user_id = None
         self._user_password = None
 
+    def DeleteService(self, name, namespace='default'):
+        '''Delete a new Service'''
+
+        url = ('%(base_url)s/namespaces/%(ns)s/services/%(name)s' %
+               {"base_url":self.base_url, "ns":namespace, "name":name})
+        json = self._RequestUrl(url, 'DELETE')
+        if json.status_code is not 200:
+            raise KubernetesError({'message': 'parsing error ['+simplejson.dumps(json.content)+']'})
+
+    def DeletePods(self, name, namespace='default'):
+        '''Delete a new Pod'''
+
+        url = ('%(base_url)s/namespaces/%(ns)s/pods/%(name)s' %
+               {"base_url":self.base_url, "ns":namespace, "name":name})
+        json = self._RequestUrl(url, 'DELETE')
+        if json.status_code is not 200:
+            raise KubernetesError({'message': 'parsing error ['+simplejson.dumps(json.content)+']'})
+
+    def DeleteReplicationController(self, name, namespace='default'):
+        '''Delete a new Service'''
+
+        url = ('%(base_url)s/namespaces/%(ns)s/replicationcontrollers/%(name)s' %
+               {"base_url":self.base_url, "ns":namespace, "name":name})
+        json = self._RequestUrl(url, 'DELETE')
+        if json.status_code is not 200:
+            raise KubernetesError({'message': 'parsing error ['+simplejson.dumps(json.content)+']'})
+
     def CreateService(self, data, namespace='default'):
         '''Create a new Service'''
 
@@ -131,6 +167,8 @@ class Api(object):
         json = self._RequestUrl(url, 'POST', data)
         if json.status_code is not 201:
             raise KubernetesError({'message': 'parsing error ['+simplejson.dumps(json.content)+']'})
+        result = self._ParseAndCheckKubernetes(json.content)
+        return Service.NewFromJsonDict(result)
 
     def CreateRc(self, data, namespace='default'):
         '''Create a new ReplicationController'''
@@ -140,6 +178,8 @@ class Api(object):
         json = self._RequestUrl(url, 'POST', data)
         if json.status_code is not 201:
             raise KubernetesError({'message': 'parsing error ['+simplejson.dumps(json.content)+']'})
+        result = self._ParseAndCheckKubernetes(json.content)
+        return ReplicationController.NewFromJsonDict(result)
 
     def CreatePod(self, data, namespace='default'):
         '''Create a new Pod'''
@@ -149,6 +189,8 @@ class Api(object):
         json = self._RequestUrl(url, 'PUT', data)
         if json.status_code is not 201:
             raise KubernetesError({'message': 'parsing error ['+simplejson.dumps(json.content)+']'})
+        result = self._ParseAndCheckKubernetes(json.content)
+        return Pod.NewFromJsonDict(result)
 
     def GetPods(self, namespace=None):
         '''List all pods on this cluster'''
@@ -321,7 +363,7 @@ class Api(object):
                 raise KubernetesError(str(e))
         if verb == 'DELETE':
             try:
-                return requests.get(
+                return requests.delete(
                     url,
                     auth=None,
                     timeout=self._timeout,

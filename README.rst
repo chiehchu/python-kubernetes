@@ -5,7 +5,7 @@ Python Kubernetes
 A Python wrapper around the Kubernetes API.
 
 By the Python-Kubernetes Developers <pjs7678@gmail.com>
-
+Updated by Chieh.Chu to support API version v1beta3 <chieh.chu@hotmail.com>
 
 ============
 Introduction
