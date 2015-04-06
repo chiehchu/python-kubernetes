@@ -192,6 +192,16 @@ class Api(object):
         result = self._ParseAndCheckKubernetes(json.content)
         return Pod.NewFromJsonDict(result)
 
+    def GetPod(self, name, namespace=default):
+        '''List the specific pod on this cluster'''
+
+        # Make and send requests
+        url = ('%(base_url)s/namespaces/%(ns)s/pods/%(name)s' %
+               {"base_url":self.base_url, "ns":namespace, "name":name})
+        json = self._RequestUrl(url, 'GET')
+        data = self._ParseAndCheckKubernetes(json.content)
+        return Pod.NewFromJsonDict(data)
+
     def GetPods(self, namespace=None):
         '''List all pods on this cluster'''
 
@@ -205,6 +215,16 @@ class Api(object):
         data = self._ParseAndCheckKubernetes(json.content)
         return PodList.NewFromJsonDict(data)
 
+    def GetReplicationController(self, name, namespace='default'):
+        '''Retrieve the specific replicationcontroller on this cluster'''
+
+        # Make and send requests
+        url = ('%(base_url)s/namespaces/%(ns)s/replicationcontrollers/%(name)s' %
+               {"base_url":self.base_url, "ns":namespace, "name":name})
+        json = self._RequestUrl(url, 'GET')
+        data = self._ParseAndCheckKubernetes(json.content)
+        return ReplicationController.NewFromJsonDict(data)
+
     def GetReplicationControllers(self, namespace=None):
         '''List all replicationcontrollers on this cluster'''
 
@@ -217,6 +237,16 @@ class Api(object):
         json = self._RequestUrl(url, 'GET')
         data = self._ParseAndCheckKubernetes(json.content)
         return ReplicationControllerList.NewFromJsonDict(data)
+
+    def GetService(self, name, namespace='default'):
+        '''List the specific service on this cluster'''
+
+        # Make and send requests
+        url = ('%(base_url)s/namespaces/%(ns)s/services/%(name)s' %
+               {"base_url":self.base_url, "ns":namespace, "name":name})
+        json = self._RequestUrl(url, 'GET')
+        data = self._ParseAndCheckKubernetes(json.content)
+        return Service.NewFromJsonDict(data)
 
     def GetServices(self, namespace=None):
         '''List all services on this cluster'''
