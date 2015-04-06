@@ -9,6 +9,7 @@ import os
 import sys
 import json
 import kubernetes
+import time
 
 from kubernetes import KubernetesError
 
@@ -157,20 +158,19 @@ def main():
     except KubernetesError,e:
         print e.message
     try:
-        pod_list = api.GetPods(namespace=namespace)
+        pod_list = api.GetPods(namespace=namespace, selector="nginx-test1")
         if rc_obj:
-            import time
             while(pod_list.Items is None or (len(pod_list.Items) < rc_obj.DesiredState)):
-                pod_list = api.GetPods(namespace=namespace)
+                pod_list = api.GetPods(namespace=namespace, selector="nginx-test1")
                 time.sleep(1)
         rc_list = api.GetReplicationControllers(namespace=namespace)
         srv_list = api.GetServices(namespace=namespace)
     except UnicodeDecodeError:
         print "Error!! "
         sys.exit(2)
-        print "GetReplicationControllers: %s" % (rc_list.AsJsonString())
-        print "GetPods: %s" % (pod_list.AsJsonString())
-        print "GetServices: %s" % (srv_list.AsJsonString())
+    print "GetReplicationControllers: %s" % (rc_list.AsJsonString())
+    print "GetPods: %s" % (pod_list.AsJsonString())
+    print "GetServices: %s" % (srv_list.AsJsonString())
 
     try:
         if rc_list.Items:

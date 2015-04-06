@@ -192,7 +192,7 @@ class Api(object):
         result = self._ParseAndCheckKubernetes(json.content)
         return Pod.NewFromJsonDict(result)
 
-    def GetPod(self, name, namespace=default):
+    def GetPod(self, name, namespace='default'):
         '''List the specific pod on this cluster'''
 
         # Make and send requests
@@ -202,7 +202,7 @@ class Api(object):
         data = self._ParseAndCheckKubernetes(json.content)
         return Pod.NewFromJsonDict(data)
 
-    def GetPods(self, namespace=None):
+    def GetPods(self, namespace=None, selector=None):
         '''List all pods on this cluster'''
 
         # Make and send requests
@@ -211,6 +211,10 @@ class Api(object):
                 {"base_url":self.base_url, "ns":namespace})
         else:
             url = '%s/pods' % self.base_url
+        if selector:
+            selector_str = 'name=%s' % selector
+            #TODO selector name would be replaced by 'labelSelector' soon
+            url = self._BuildUrl(url, extra_params={'label-selector':selector_str})
         json = self._RequestUrl(url, 'GET')
         data = self._ParseAndCheckKubernetes(json.content)
         return PodList.NewFromJsonDict(data)
@@ -343,7 +347,7 @@ class Api(object):
                 query = extra_query
 
         # Return the rebuilt URL
-        return urlparse.urlparse((scheme, netloc, path, params, query, fragment))
+        return urlparse.urlunparse((scheme, netloc, path, params, query, fragment))
 
     def _RequestUrl(self, url, verb, data=None):
         '''Request a url.
