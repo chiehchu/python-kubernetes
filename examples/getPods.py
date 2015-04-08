@@ -85,7 +85,7 @@ class KubernetesRc(object):
 def main():
     try:
         shortflags = 'h'
-        longflags = ['help', 'rc-data=', 'pod-data=', 'service-data=', 'version=', 'host=', 'namespace=', 'user-id=', 'user-pw=', 'url=', 'encoding=']
+        longflags = ['help', 'rc-data-new=', 'rc-data=', 'pod-data=', 'service-data=', 'version=', 'host=', 'namespace=', 'user-id=', 'user-pw=', 'url=', 'encoding=']
         opts, args = getopt.gnu_getopt(sys.argv[1:], shortflags, longflags)
     except getopt.GetoptError:
         PrintUsageAndExit()
@@ -98,6 +98,7 @@ def main():
     version = 'v1beta3'
     host = '172.30.10.185'
     rc_data = None
+    rc_data_new = None
     service_data = None
     pod_data = None
     for o, a in opts:
@@ -121,6 +122,8 @@ def main():
             pod_data= a
         if o in ("--rc-data"):
             rc_data= a
+        if o in ("--rc-data-new"):
+            rc_data_new= a
         if o in ("--service-data"):
             service_data= a
 
@@ -149,8 +152,7 @@ def main():
             f = open(rc_data)
             content = f.read()
             f.close()
-            rc_obj = api.CreateRc(data=content, namespace=namespace)
-
+            rc_obj = api.CreateReplicationController(data=content, namespace=namespace)
         if service_data:
             f = open(service_data)
             content = f.read()
@@ -175,8 +177,9 @@ def main():
     try:
         if rc_list.Items:
             for rc in rc_list.Items:
-                api.DeleteReplicationController(name=rc.Name, namespace=namespace)
-                time.sleep(5)
+                import ipdb; ipdb.set_trace()  # XXX BREAKPOINT
+                #api.DeleteReplicationController(name=rc.Name, namespace=namespace)
+                api.ResizeReplicationController(name=rc.Name, namespace=namespace, replicas=0)
         if pod_list.Items:
             while ((api.GetReplicationControllers(namespace)).Items):
                 time.sleep(1)

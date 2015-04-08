@@ -138,7 +138,7 @@ class Api(object):
         url = ('%(base_url)s/namespaces/%(ns)s/services/%(name)s' %
                {"base_url":self.base_url, "ns":namespace, "name":name})
         json = self._RequestUrl(url, 'DELETE')
-        if json.status_code is not 200:
+        if json.status_code not in [200, 404]:
             raise KubernetesError({'message': 'parsing error ['+simplejson.dumps(json.content)+']'})
 
     def DeletePods(self, name, namespace='default'):
@@ -147,7 +147,7 @@ class Api(object):
         url = ('%(base_url)s/namespaces/%(ns)s/pods/%(name)s' %
                {"base_url":self.base_url, "ns":namespace, "name":name})
         json = self._RequestUrl(url, 'DELETE')
-        if json.status_code is not 200:
+        if json.status_code not in [200, 404]:
             raise KubernetesError({'message': 'parsing error ['+simplejson.dumps(json.content)+']'})
 
     def DeleteReplicationController(self, name, namespace='default'):
@@ -156,7 +156,7 @@ class Api(object):
         url = ('%(base_url)s/namespaces/%(ns)s/replicationcontrollers/%(name)s' %
                {"base_url":self.base_url, "ns":namespace, "name":name})
         json = self._RequestUrl(url, 'DELETE')
-        if json.status_code is not 200:
+        if json.status_code not in [200, 404]:
             raise KubernetesError({'message': 'parsing error ['+simplejson.dumps(json.content)+']'})
 
     def CreateService(self, data, namespace='default'):
@@ -170,7 +170,7 @@ class Api(object):
         result = self._ParseAndCheckKubernetes(json.content)
         return Service.NewFromJsonDict(result)
 
-    def CreateRc(self, data, namespace='default'):
+    def CreateReplicationController(self, data, namespace='default'):
         '''Create a new ReplicationController'''
 
         url = ('%(base_url)s/namespaces/%(ns)s/replicationcontrollers' %
@@ -199,6 +199,9 @@ class Api(object):
         url = ('%(base_url)s/namespaces/%(ns)s/pods/%(name)s' %
                {"base_url":self.base_url, "ns":namespace, "name":name})
         json = self._RequestUrl(url, 'GET')
+        if json.status_code == 404:
+            #not exit, just return None
+            return None
         data = self._ParseAndCheckKubernetes(json.content)
         return Pod.NewFromJsonDict(data)
 
@@ -219,19 +222,48 @@ class Api(object):
         data = self._ParseAndCheckKubernetes(json.content)
         return PodList.NewFromJsonDict(data)
 
-    def GetReplicationController(self, name, namespace='default'):
-        '''Retrieve the specific replicationcontroller on this cluster'''
-
+    def _HandleReplicationController(self, name, namespace, action, data_str=None):
+        '''Retrieve the specific ReplicationController and convert to dict'''
         # Make and send requests
         url = ('%(base_url)s/namespaces/%(ns)s/replicationcontrollers/%(name)s' %
                {"base_url":self.base_url, "ns":namespace, "name":name})
-        json = self._RequestUrl(url, 'GET')
+        json = self._RequestUrl(url, action, data_str)
+        return json
+
+    def ResizeReplicationController(self, name, replicas, namespace='default'):
+        '''Update an existing ReplicationController by given data'''
+        #retrieve the specific replicationcontroller first
+        json = self._HandleReplicationController(name=name,
+                                                 action='GET',
+                                                 namespace=namespace)
+        if json.status_code == 404:
+            #not exit, just return None
+            return None
+        data = self._ParseAndCheckKubernetes(json.content)
+        #update the value of replicas, note, for v1beta3 only
+        data['spec']['replicas']=replicas
+        json = self._HandleReplicationController(name=name,
+                                                 action='PUT',
+                                                 namespace=namespace,
+                                                 data_str=simplejson.dumps(data))
+        if json.status_code is not 200:
+            raise KubernetesError({'message': 'parsing error ['+simplejson.dumps(json.content)+']'})
+        result = self._ParseAndCheckKubernetes(json.content)
+        return ReplicationController.NewFromJsonDict(result)
+
+    def GetReplicationController(self, name, namespace='default'):
+        '''Retrieve the specific replicationcontroller on this cluster'''
+        json = self._HandleReplicationController(name=name,
+                                                       action='GET',
+                                                       namespace=namespace)
+        if json.status_code == 404:
+            #not exit, just return None
+            return None
         data = self._ParseAndCheckKubernetes(json.content)
         return ReplicationController.NewFromJsonDict(data)
 
     def GetReplicationControllers(self, namespace=None):
         '''List all replicationcontrollers on this cluster'''
-
         # Make and send requests
         if namespace:
             url = ('%(base_url)s/namespaces/%(ns)s/replicationcontrollers' %
@@ -249,6 +281,9 @@ class Api(object):
         url = ('%(base_url)s/namespaces/%(ns)s/services/%(name)s' %
                {"base_url":self.base_url, "ns":namespace, "name":name})
         json = self._RequestUrl(url, 'GET')
+        if json.status_code == 404:
+            #not exit, just return None
+            return None
         data = self._ParseAndCheckKubernetes(json.content)
         return Service.NewFromJsonDict(data)
 
